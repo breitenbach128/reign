@@ -1,5 +1,5 @@
 
-    import BoardPlugin from 'plugins/board-plugin.js';
+    import BoardPlugin from './plugins/board-plugin.js';
 
     const COLOR_PRIMARY = 0x03a9f4;
     const COLOR_LIGHT = 0x67daff;
@@ -13,11 +13,7 @@
         }
 
         preload() {
-            this.load.scenePlugin({
-                key: 'rexBoard',
-                url: 'plugins/board-plugin.js',
-                sceneKey: 'rexBoard'
-            });
+
          }
 
         create() {
