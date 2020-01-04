@@ -1,38 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>    	
-    <!-- <script src="/socket.io/socket.io.js"></script> -->
-    <script src="phaser.js"></script>
-    
-
-    <style>
-    @font-face {
-	font-family: 'xirod';
-	src: url('assets/fonts/xirod.eot');
-	src: local('☺'), url('assets/fonts/xirod.woff') format('woff'), url('assets/fonts/xirod.ttf') format('truetype'), url('assets/fonts/xirod.svg') format('svg');
-	font-weight: normal;
-	font-style: normal;
-    }
-    @font-face {
-        font-family: 'visitorTT1';
-        src: url('assets/fonts/visitor/VisitorTT1BRK.eot');
-        src: local('☺'), url('assets/fonts/visitor/VisitorTT1BRK.woff') format('woff'), url('assets/fonts/visitor/visitor1.ttf') format('truetype'), url('assets/fonts/visitor/VisitorTT1BRK.svg') format('svg');
-        font-weight: normal;
-        font-style: normal;
-    }
-    .fontLoader {
-        position: absolute;
-        left: -1000px;
-        visibility: hidden;
-    }
-    </style>
-</head>
-<body>
-    <div class="fontLoader" style="font-family: xirod;">-</div>
-    <div class="fontLoader" style="font-family: visitorTT1;">-</div>
-    <script src="game.js" type="module"></script>
-
- 
-
-</body>
+	<head>
+	<style type="text/css">
+		body{
+			background: #000000;
+			padding:0px;
+			margin:0px;
+		}
+	</style>
+	<script src="phaser.js"></script>
+	</head>
+	<body>
+		<div id='gameholder' style="padding-left: 100px; border: 2px solid white;">
+			<script src="game.js"></script>
+		</div>
+	</body>
 </html>

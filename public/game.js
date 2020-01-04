@@ -1,111 +1,118 @@
+window.onload = function() {              
 
-    import BoardPlugin from './plugins/board-plugin.js';
+	var hexagonWidth = 70;
+	var hexagonHeight = 80;
+	var gridSizeX = 12;
+	var gridSizeY = 7;
+	var columns = [Math.ceil(gridSizeX/2),Math.floor(gridSizeX/2)];
+     var moveIndex;
+     var sectorWidth = hexagonWidth;
+     var sectorHeight = hexagonHeight/4*3;
+     var gradient = (hexagonHeight/4)/(hexagonWidth/2);
+     var marker;
+     var hexagonGroup;
 
-    const COLOR_PRIMARY = 0x03a9f4;
-    const COLOR_LIGHT = 0x67daff;
-    const COLOR_DARK = 0x007ac1;
+     var config = {
+          type: Phaser.AUTO,
+          width: 640,
+          height: 480,
+          parent: 'gameholder',
+          backgroundColor: '#2d2d2d',
+          scene: {
+              preload: onPreload,
+              create: onCreate
+          }
+      };
+      
+      var game = new Phaser.Game(config);
+      
+	function onPreload() {
+		this.load.image("hexagon", "assets/hexagon.png");
+          this.load.image("marker", "assets/marker.png");
+          console.log("preload completed")
+	}
 
-    class Demo extends Phaser.Scene {
-        constructor() {
-            super({
-                key: 'examples'
-            })
-        }
+	function onCreate() {
+          console.log("created");
+          let { game_width, game_height } = this.sys.game.canvas;
+          // game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+          // game.scale.pageAlignHorizontally = true;
+          // game.scale.pageAlignVertically = true;
 
-        preload() {
-
-         }
-
-        create() {
-            var gridGraphics = this.add.graphics({
-                lineStyle: {
-                    width: 1,
-                    color: COLOR_DARK,
-                    alpha: 1
-                }
-            });
-
-            var board = this.rexBoard.add.board({
-                grid: getHexagonGrid(this),
-                // grid: getQuadGrid(this),
-                width: 10,
-                height: 10
-            })
-                .forEachTileXY(function (tileXY, board) {
-                    var points = board.getGridPoints(tileXY.x, tileXY.y, true);
-                    gridGraphics.strokePoints(points, true);
-                }, this);
-
-            board
-                .setInteractive()
-                .on('tiledown', function (pointer, tileXY) {
-                    Phaser.Actions.Call(board.tileZToChessArray(0), function (gameObject) {
-                        gameObject.destroy();
-                    });
-
-                    if (!board.contains(tileXY.x, tileXY.y)) {
-                        return;
+		hexagonGroup = this.add.group();
+	     for(var i = 0; i < gridSizeY/2; i ++){
+			for(var j = 0; j < gridSizeX; j ++){
+				if(gridSizeY%2==0 || i+1<gridSizeY/2 || j%2==0){
+					var hexagonX = hexagonWidth*j/2;
+					var hexagonY = hexagonHeight*i*1.5+(hexagonHeight/4*3)*(j%2);	
+					var hexagon = this.add.sprite(hexagonX,hexagonY,"hexagon");
+					hexagonGroup.add(hexagon);
+				}
+			}
+		}
+		hexagonGroup.x = (game_width-hexagonWidth*Math.ceil(gridSizeX/2))/2;
+          if(gridSizeX%2==0){
+               hexagonGroup.x-=hexagonWidth/4;
+          }
+		hexagonGroup.y = (game_height-Math.ceil(gridSizeY/2)*hexagonHeight-Math.floor(gridSizeY/2)*hexagonHeight/2)/2;
+          if(gridSizeY%2==0){
+               hexagonGroup.y-=hexagonHeight/8;
+          }
+		marker = this.add.sprite(0,0,"marker");
+		marker.setOrigin(0.5);
+		marker.visible=true;//Toggle for testing
+		hexagonGroup.add(marker);  
+          moveIndex = this.input.on('pointermove', checkHex, this);		
+	}
+     
+     function checkHex(){
+          console.log("mouse_moved");
+          var candidateX = Math.floor((this.input.worldX-hexagonGroup.x)/sectorWidth);
+          var candidateY = Math.floor((this.input.worldY-hexagonGroup.y)/sectorHeight);
+          var deltaX = (this.input.worldX-hexagonGroup.x)%sectorWidth;
+          var deltaY = (this.input.worldY-hexagonGroup.y)%sectorHeight; 
+          if(candidateY%2==0){
+               if(deltaY<((hexagonHeight/4)-deltaX*gradient)){
+                    candidateX--;
+                    candidateY--;
+               }
+               if(deltaY<((-hexagonHeight/4)+deltaX*gradient)){
+                    candidateY--;
+               }
+          }    
+          else{
+               if(deltaX>=hexagonWidth/2){
+                    if(deltaY<(hexagonHeight/2-deltaX*gradient)){
+                         candidateY--;
                     }
-
-                    this.rexBoard.add.shape(board, tileXY.x, tileXY.y, 0, COLOR_PRIMARY).setScale(0.7);
-                    var neighborsTileXYArray = board.getNeighborTileXY(tileXY, '0,2,4');
-                    var neighborTileXY;
-                    for (var i = 0, cnt = neighborsTileXYArray.length; i < cnt; i++) {
-                        neighborTileXY = neighborsTileXYArray[i];
-                        if (!board.contains(neighborTileXY.x, neighborTileXY.y)) {
-                            continue;
-                        }
-                        this.rexBoard.add.shape(board, neighborTileXY.x, neighborTileXY.y, 0, COLOR_LIGHT).setScale(0.7);
+               }
+               else{
+                    if(deltaY<deltaX*gradient){
+                         candidateY--;
                     }
-                }, this)
+                    else{
+                         candidateX--;
+                    }
+               }
+          }
+          placeMarker(candidateX,candidateY);
+     }
+     
+     function placeMarker(posX,posY){
+		if(posX<0 || posY<0 || posY>=gridSizeY || posX>columns[posY%2]-1){
+			marker.visible=false;
+		}
+		else{
+			marker.visible=true;
+			marker.x = hexagonWidth*posX;
+			marker.y = hexagonHeight/4*3*posY+hexagonHeight/2;
+			if(posY%2==0){
+				marker.x += hexagonWidth/2;
+			}
+			else{
+				marker.x += hexagonWidth;
+			}
+		}
+	}
 
-        }
-
-        update() { }
-    }
-
-    var getQuadGrid = function (scene) {
-        var grid = scene.rexBoard.add.quadGrid({
-            x: 400,
-            y: 100,
-            cellWidth: 100,
-            cellHeight: 50,
-            type: 1
-        });
-        return grid;
-    }
-
-    var getHexagonGrid = function (scene) {
-        var staggeraxis = 'x';
-        var staggerindex = 'odd';
-        var grid = scene.rexBoard.add.hexagonGrid({
-            x: 100,
-            y: 100,
-            cellWidth: 36,
-            cellHeight: 36,
-            staggeraxis: staggeraxis,
-            staggerindex: staggerindex
-        })
-        return grid;
-    };
-
-    var config = {
-        type: Phaser.AUTO,
-        parent: 'phaser-example',
-        width: 800,
-        height: 600,
-        scale: {
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
-        },
-        scene: Demo,
-        plugins: {
-            scene: [{
-                key: 'rexBoard',
-                plugin: BoardPlugin,
-                mapping: 'rexBoard'
-            }]
-        }
-    };
-
-    var game = new Phaser.Game(config);
+}
