@@ -34,7 +34,10 @@ window.onload = function() {
 
 	function onCreate() {
           console.log("created");
-          let { game_width, game_height } = this.sys.game.canvas;
+          let cv = this.sys.game.canvas;
+          game_width = cv.width;
+          game_height = cv.height;
+
           // game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
           // game.scale.pageAlignHorizontally = true;
           // game.scale.pageAlignVertically = true;
@@ -45,8 +48,9 @@ window.onload = function() {
 				if(gridSizeY%2==0 || i+1<gridSizeY/2 || j%2==0){
 					var hexagonX = hexagonWidth*j/2;
 					var hexagonY = hexagonHeight*i*1.5+(hexagonHeight/4*3)*(j%2);	
-					var hexagon = this.add.sprite(hexagonX,hexagonY,"hexagon");
-					hexagonGroup.add(hexagon);
+                         var hexagon = this.add.sprite(hexagonX+hexagonWidth/2,hexagonY+hexagonHeight/2,"hexagon");
+                         hexagonGroup.add(hexagon);
+                         console.log(j,i);
 				}
 			}
 		}
@@ -58,19 +62,24 @@ window.onload = function() {
           if(gridSizeY%2==0){
                hexagonGroup.y-=hexagonHeight/8;
           }
+          hexagonGroup.x = 0;
+          hexagonGroup.y = 0;
+          console.log("Group Sizes:",game_width,game_height,hexagonGroup.x,hexagonGroup.y,hexagonGroup);
 		marker = this.add.sprite(0,0,"marker");
 		marker.setOrigin(0.5);
 		marker.visible=true;//Toggle for testing
 		hexagonGroup.add(marker);  
-          moveIndex = this.input.on('pointermove', checkHex, this);		
+          moveIndex = this.input.on('pointermove', checkHex, this);	
+          
+          this.mouse_txt = this.add.text(game_width-196, 0, 'M(X/Y):', { fontSize:12, fontFamily: '"xirod"' });
+          this.grid_txt = this.add.text(game_width-196, 32, 'H(X/Y):', { fontSize:12, fontFamily: '"xirod"' });
 	}
      
-     function checkHex(){
-          console.log("mouse_moved");
-          var candidateX = Math.floor((this.input.worldX-hexagonGroup.x)/sectorWidth);
-          var candidateY = Math.floor((this.input.worldY-hexagonGroup.y)/sectorHeight);
-          var deltaX = (this.input.worldX-hexagonGroup.x)%sectorWidth;
-          var deltaY = (this.input.worldY-hexagonGroup.y)%sectorHeight; 
+     function checkHex(pointer){
+          var candidateX = Math.floor((pointer.worldX-hexagonGroup.x)/sectorWidth);
+          var candidateY = Math.floor((pointer.worldY-hexagonGroup.y)/sectorHeight);
+          var deltaX = (pointer.worldX-hexagonGroup.x)%sectorWidth;
+          var deltaY = (pointer.worldY-hexagonGroup.y)%sectorHeight; 
           if(candidateY%2==0){
                if(deltaY<((hexagonHeight/4)-deltaX*gradient)){
                     candidateX--;
@@ -95,6 +104,14 @@ window.onload = function() {
                     }
                }
           }
+          
+          //console.log("mouse_moved",deltaX,deltaY,candidateX,candidateY);
+          this.mouse_txt.setText("M(X/Y):"+pointer.worldX+","+pointer.worldY)
+          this.grid_txt.setText("H(X/Y):"+candidateX+","+candidateY)
+          
+          //hexagonGroup.clearTint();
+          //hexagonGroup.getChildren()[candidateX+candidateY*gridSizeY].setTint(0xFF0000);
+
           placeMarker(candidateX,candidateY);
      }
      
