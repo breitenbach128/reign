@@ -3,7 +3,7 @@ window.onload = function() {
 	var hexagonWidth = 140;
 	var hexagonHeight = 160;
 	var gridSizeX = 12;
-	var gridSizeY = 8;
+	var gridSizeY = 6;
 	var columns = [Math.ceil(gridSizeX/2),Math.floor(gridSizeX/2)];
      var moveIndex;
      var sectorWidth = hexagonWidth;
@@ -16,7 +16,7 @@ window.onload = function() {
      var config = {
           type: Phaser.AUTO,
           width: 1280,
-          height: 1040,
+          height: 960,
           parent: 'gameholder',
           backgroundColor: '#2d2d2d',
           scene: {
@@ -30,6 +30,7 @@ window.onload = function() {
 	function onPreload() {
 		this.load.image("hexagon", "assets/hexagon_tile2.png");
           this.load.image("marker", "assets/marker.png");
+          this.load.spritesheet("icons", "assets/icons.png",{ frameWidth: 16, frameHeight: 16 });
           console.log("preload completed")
 	}
 
@@ -38,10 +39,12 @@ window.onload = function() {
           let cv = this.sys.game.canvas;
           game_width = cv.width;
           game_height = cv.height;
-
+          offsetX = 250;
           // game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
           // game.scale.pageAlignHorizontally = true;
           // game.scale.pageAlignVertically = true;
+          var board_rect = this.add.rectangle(game_width/2, game_height/2, game_width, game_height, 0x6993b8);
+          board_rect.setInteractive();
 
           hexagonGroup = this.add.group();
           let count=0;
@@ -50,10 +53,10 @@ window.onload = function() {
 				if(gridSizeY%2==0 || i+1<gridSizeY/2 || j%2==0){
 					var hexagonX = hexagonWidth*j/2;
 					var hexagonY = hexagonHeight*i*1.5+(hexagonHeight/4*3)*(j%2);	
-                         var hexagon = new Kingdom(this,hexagonX+hexagonWidth/2,hexagonY+hexagonHeight/2);
+                         var hexagon = new Kingdom(this,hexagonX+hexagonWidth/2+offsetX,hexagonY+hexagonHeight/2);
                          hexagon.setup(count);
                          hexagonGroup.add(hexagon);
-                         hexTextNames.push(this.add.text(hexagonX+hexagonWidth/2, hexagonY+hexagonHeight/2, (j+','+i), { color: "#000000", fontSize:12, fontFamily: '"xirod"', align:'center' }))
+                         hexTextNames.push(this.add.text(hexagonX+hexagonWidth/2+offsetX, hexagonY+hexagonHeight/2, (j+','+i), { color: "#000000", fontSize:12, fontFamily: '"xirod"', align:'center' }))
                          console.log(j,i,count);
                          count++;
 				}
@@ -67,7 +70,7 @@ window.onload = function() {
           if(gridSizeY%2==0){
                hexagonGroup.y-=hexagonHeight/8;
           }
-          hexagonGroup.x = 0;
+          hexagonGroup.x = 0+offsetX;
           hexagonGroup.y = 0;
           console.log("Group Sizes:",game_width,game_height,hexagonGroup.x,hexagonGroup.y,hexagonGroup);
 		marker = this.add.sprite(0,0,"marker");
@@ -76,10 +79,36 @@ window.onload = function() {
 		hexagonGroup.add(marker);  
           moveIndex = this.input.on('pointermove', checkHex, this);
 
-          this.input.on('pointerup', getKingdom, this);
+          //this.input.on('pointerup', clickHex, this);
+          board_rect.on('pointerup', clickHex, this);
 
           this.mouse_txt = this.add.text(game_width-196, 0, 'M(X/Y):', { fontSize:12, fontFamily: '"xirod"' });
           this.grid_txt = this.add.text(game_width-196, 32, 'H(X/Y):', { fontSize:12, fontFamily: '"xirod"' });
+          
+          //this.add.rectangle(game_width/2, game_height-128, game_width-4, 256, 0x1b2c3a).setStrokeStyle(2, 0x253a4e).setAlpha(0.95);
+          var hud_left_1 = this.add.rectangle((game_width*(3/8)), game_height-96, (game_width*(3/4))-16, 160, 0x1b2c3a).setAlpha(0.95);
+          var hud_right_1 = this.add.rectangle((game_width*(7/8)), game_height-96, (game_width*(1/4))-16, 160, 0x1b2c3a).setAlpha(0.95);
+
+          var hud_left_1_header = this.add.rectangle((game_width*(3/8)), game_height-156, (game_width*(3/4))-30, 32, 0x172531).setAlpha(0.95);
+          var hud_right_1_header = this.add.rectangle((game_width*(7/8)), game_height-156, (game_width*(1/4))-30, 32, 0x172531).setAlpha(0.95);
+
+         var hud_left_1_header_text = this.add.text((game_width*(3/8)), game_height-156, 'Kingdom Information', { fontSize:12, fontFamily: '"xirod"', align:'center' }).setOrigin(0.5);
+         var hud_right_1_header_text = this.add.text((game_width*(7/8)), game_height-156, 'Actions', { fontSize:12, fontFamily: '"xirod"', align:'center' }).setOrigin(0.5);
+
+         //Add menu sprites/images
+         let menu_icon_wealth = this.add.sprite((game_width*(1/16)), game_height-112, 'icons', 0).setScale(2);
+         let menu_icon_population = this.add.sprite((game_width*(2/16)), game_height-112, 'icons', 1).setScale(2);
+         let menu_icon_wood = this.add.sprite((game_width*(3/16)), game_height-112, 'icons', 2).setScale(2);
+         let menu_icon_influence = this.add.sprite((game_width*(4/16)), game_height-112, 'icons', 3).setScale(2);
+         let menu_icon_tax = this.add.sprite((game_width*(5/16)), game_height-112, 'icons', 4).setScale(2);
+         let menu_icon_attractiveness = this.add.sprite((game_width*(6/16)), game_height-112, 'icons', 5).setScale(2);
+         let menu_icon_military = this.add.sprite((game_width*(7/16)), game_height-112, 'icons', 6).setScale(2);
+
+         //Add text counts
+         var menu_txt_wealth = this.add.text((game_width*(1/16))+10, game_height-112, ' 00', { fontSize:12, fontFamily: '"xirod"', align:'left' });
+         var menu_txt_population = this.add.text((game_width*(2/16))+10, game_height-112, ' 00', { fontSize:12, fontFamily: '"xirod"', align:'left' });
+         
+
      }
      function getHexTile(pointer){
           var candidateX = Math.floor((pointer.worldX-hexagonGroup.x)/sectorWidth);
@@ -120,28 +149,34 @@ window.onload = function() {
 
           return resultant_index;
      }
-     function getKingdom(pointer){
+     function clickHex(pointer){
           let atHex = getHexTile(pointer);
-          let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
-          let kingdom = hexagonGroup.getChildren()[idHex];
-          console.log( kingdom.id, kingdom.wealth)
+               if((atHex.x >= 0 && atHex.x < gridSizeX/2) && (atHex.y >= 0 && atHex.y < gridSizeY)){
+               let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
+               let kingdom = hexagonGroup.getChildren()[idHex];
+               console.log( kingdom.id, kingdom.wealth)
+          }
      }
      function checkHex(pointer){
           let atHex = getHexTile(pointer);
-          let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
 
-          //Need constraint check for location to be within grid.
+          //Is this within the grid?
+          if((atHex.x >= 0 && atHex.x < gridSizeX/2) && (atHex.y >= 0 && atHex.y < gridSizeY)){
 
-          this.mouse_txt.setText("M(X/Y):"+pointer.worldX+","+pointer.worldY);
-          this.grid_txt.setText("H(X/Y):"+atHex.x+","+atHex.y);
+               let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
 
-          if(idHex >= 0 && idHex <hexagonGroup.getChildren().length){
-               hexagonGroup.getChildren().forEach(function(e){
-                    e.clearTint();
-               });
-               hexagonGroup.getChildren()[idHex].setTint(0xFF0000);
+               //Need constraint check for location to be within grid.
+
+               this.mouse_txt.setText("M(X/Y):"+pointer.worldX+","+pointer.worldY);
+               this.grid_txt.setText("H(X/Y):"+atHex.x+","+atHex.y);
+
+               if(idHex >= 0 && idHex <hexagonGroup.getChildren().length){
+                    hexagonGroup.getChildren().forEach(function(e){
+                         e.clearTint();
+                    });
+                    hexagonGroup.getChildren()[idHex].setTint(0xFF0000);
+               }
           }
-
           //placeMarker(candidateX,candidateY);
      }
 
