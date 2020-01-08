@@ -7,6 +7,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
     setup(id){
         this.id = id;
         this.wealth = 0;
+        this.taxrate = 0.0;
         this.population = 1;
         this.luxaries = {
             gold: 0,

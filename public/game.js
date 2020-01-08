@@ -121,7 +121,10 @@ window.onload = function() {
           return resultant_index;
      }
      function getKingdom(pointer){
-
+          let atHex = getHexTile(pointer);
+          let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
+          let kingdom = hexagonGroup.getChildren()[idHex];
+          console.log( kingdom.id, kingdom.wealth)
      }
      function checkHex(pointer){
           let atHex = getHexTile(pointer);
