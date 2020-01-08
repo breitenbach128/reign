@@ -107,7 +107,18 @@ window.onload = function() {
          //Add text counts
          var menu_txt_wealth = this.add.text((game_width*(1/16))+10, game_height-112, ' 00', { fontSize:12, fontFamily: '"xirod"', align:'left' });
          var menu_txt_population = this.add.text((game_width*(2/16))+10, game_height-112, ' 00', { fontSize:12, fontFamily: '"xirod"', align:'left' });
-         
+
+         //var button1 = new textButton(this, "marker", "BUTTONTEST", {}, 25, 25, function(){console.log("button clicked");}, this);
+         var textButton = new uiWidgets.TextButton(
+               this,
+               "marker",
+               "BUTTONTEST",
+               {},
+               25,
+               25,
+               function(){console.log("button clicked");}, 
+               this
+          );
 
      }
      function getHexTile(pointer){
