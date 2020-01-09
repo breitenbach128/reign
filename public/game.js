@@ -31,6 +31,7 @@ window.onload = function() {
 		this.load.image("hexagon", "assets/hexagon_tile2.png");
           this.load.image("marker", "assets/marker.png");
           this.load.spritesheet("icons", "assets/icons.png",{ frameWidth: 16, frameHeight: 16 });
+          this.load.spritesheet("button1", "assets/button1.png",{ frameWidth: 64, frameHeight: 32 });
           console.log("preload completed")
 	}
 
@@ -105,8 +106,13 @@ window.onload = function() {
          let menu_icon_military = this.add.sprite((game_width*(7/16)), game_height-112, 'icons', 6).setScale(2);
 
          //Add text counts
-         var menu_txt_wealth = this.add.text((game_width*(1/16))+10, game_height-112, ' 00', { fontSize:12, fontFamily: '"xirod"', align:'left' });
-         var menu_txt_population = this.add.text((game_width*(2/16))+10, game_height-112, ' 00', { fontSize:12, fontFamily: '"xirod"', align:'left' });
+         this.menu_txt_wealth = this.add.text((game_width*(1/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6, fontSize:12, fontFamily: '"xirod"', align:'left' });
+         this.menu_txt_population = this.add.text((game_width*(2/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+         this.menu_txt_wood = this.add.text((game_width*(3/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+         this.menu_txt_influence = this.add.text((game_width*(4/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+         this.menu_txt_tax = this.add.text((game_width*(5/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+         this.menu_txt_attractiveness = this.add.text((game_width*(6/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+         this.menu_txt_military = this.add.text((game_width*(7/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
 
          //var button1 = new textButton(this, "marker", "BUTTONTEST", {}, 25, 25, function(){console.log("button clicked");}, this);
          var textButton = new uiWidgets.TextButton(
@@ -119,6 +125,17 @@ window.onload = function() {
                function(){console.log("button clicked");}, 
                this
           );
+          console.log("button debug",textButton);
+
+          var spriteButton1a = new SpriteButton(this,(game_width*(13/16)),game_height-112,'button1',0,1,2,function(){console.log("Clicked Down")});
+          var spriteButton2a = new SpriteButton(this,(game_width*(14/16)),game_height-112,'button1',0,1,2,function(){console.log("Clicked Down")});
+          var spriteButton3a = new SpriteButton(this,(game_width*(15/16)),game_height-112,'button1',0,1,2,function(){console.log("Clicked Down")});
+
+          var spriteButton1b = new SpriteButton(this,(game_width*(13/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
+          var spriteButton2b = new SpriteButton(this,(game_width*(14/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
+          var spriteButton3b = new SpriteButton(this,(game_width*(15/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
+
+          var spriteButton3b = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x172531,0x172531,function(){console.log("Clicked Down")});
 
      }
      function getHexTile(pointer){
@@ -166,6 +183,12 @@ window.onload = function() {
                let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
                let kingdom = hexagonGroup.getChildren()[idHex];
                console.log( kingdom.id, kingdom.wealth)
+               this.menu_txt_wealth.setText(kingdom.wealth);
+               this.menu_txt_population.setText(kingdom.population);
+               this.menu_txt_wood.setText(kingdom.luxaries.wood);
+               this.menu_txt_influence.setText(kingdom.attractiveness);
+               this.menu_txt_tax.setText(kingdom.taxrate*100);
+               this.menu_txt_attractiveness.setText(kingdom.attractiveness);
           }
      }
      function checkHex(pointer){

@@ -6,9 +6,9 @@ class Kingdom extends Phaser.GameObjects.Sprite{
     }
     setup(id){
         this.id = id;
-        this.wealth = 0;
-        this.taxrate = 0.0;
-        this.population = 1;
+        this.wealth = 2500;
+        this.taxrate = 0.1;
+        this.population = 100;
         this.luxaries = {
             gold: 0,
             iron: 0,
@@ -19,7 +19,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         };
         this.attractiveness = 50;
         this.army = {
-            infantry: 0,
+            infantry: 20,
             archers: 0,
             calvary: 0,
             generals: 0,
@@ -32,3 +32,41 @@ class Kingdom extends Phaser.GameObjects.Sprite{
 
     }
 }
+
+//Buildings - 10 slots per kingdom
+// Walls - Boost Defense points by Wall*10%
+// Farm - Growth + 10%
+// Keep - Influence + 10%
+// Barracks - Train + 10% (more)
+// Mine - Generate luxury from tile + 1
+// Market - Trade gain + 10%
+
+//Soliders (off/def)
+// - Inf 1/1 25 wealth, 1 up-keep
+// - Archer 1/2 50 wealth, 2 up-keep
+// - Calvary 2/1 50 wealth, 3 up-keep
+
+//Per turn
+// - Immigration Gain/Loss
+// - Income Gain/Loss
+// - Growth
+// - Training
+// - Built
+// - Battle Results
+
+//Actions
+// Train
+// Build
+// Attack (If attacking zero pop kingdom, annex)
+// Diplomacy
+// - Trade
+// - Marriage
+
+//Luxaries
+// Each luxary gives % bonus to attraction and a special type bonus. All player starting tiles have a single luxary. Not all tiles have luxary.
+// gold:  Bonus to income
+// iron:  Bonus to Offense
+// gems: Bonus to attractivness
+// fur: Bonus to Growth
+// wood: Bonus to defense
+// spices: Bonus to trade
