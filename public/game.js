@@ -186,7 +186,7 @@ window.onload = function() {
                this.menu_txt_wealth.setText(kingdom.wealth);
                this.menu_txt_population.setText(kingdom.population);
                this.menu_txt_wood.setText(kingdom.luxaries.wood);
-               this.menu_txt_influence.setText(kingdom.attractiveness);
+               this.menu_txt_influence.setText(kingdom.influence);
                this.menu_txt_tax.setText(kingdom.taxrate*100);
                this.menu_txt_attractiveness.setText(kingdom.attractiveness);
           }

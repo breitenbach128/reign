@@ -9,6 +9,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.wealth = 2500;
         this.taxrate = 0.1;
         this.population = 100;
+        this.influence = 0;
         this.luxaries = {
             gold: 0,
             iron: 0,
@@ -60,7 +61,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
 // Attack (If attacking zero pop kingdom, annex)
 // Diplomacy
 // - Trade
-// - Marriage
+// - Marriage - Need Influence
 
 //Luxaries
 // Each luxary gives % bonus to attraction and a special type bonus. All player starting tiles have a single luxary. Not all tiles have luxary.
@@ -70,3 +71,9 @@ class Kingdom extends Phaser.GameObjects.Sprite{
 // fur: Bonus to Growth
 // wood: Bonus to defense
 // spices: Bonus to trade
+
+//Ways to take over a kingdom
+// - War(Attack)
+// - Economic Domination (Be 80% of a kingdoms wealth source via trade)
+// - Marriage (Have enough influence to force them to join you)
+// - Annex (Drive their pop to zero, and then take it.)
