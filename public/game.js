@@ -32,6 +32,9 @@ window.onload = function() {
           this.load.image("marker", "assets/marker.png");
           this.load.spritesheet("icons", "assets/icons.png",{ frameWidth: 16, frameHeight: 16 });
           this.load.spritesheet("button1", "assets/button1.png",{ frameWidth: 64, frameHeight: 32 });
+          this.load.spritesheet("button1_war", "assets/button1_War.png",{ frameWidth: 64, frameHeight: 32 });
+          this.load.spritesheet("ui_arrow_war", "assets/ui_arrow_war.png",{ frameWidth: 64, frameHeight: 64 });
+
           console.log("preload completed")
 	}
 
@@ -127,7 +130,7 @@ window.onload = function() {
           );
           console.log("button debug",textButton);
 
-          var spriteButton1a = new SpriteButton(this,(game_width*(13/16)),game_height-112,'button1',0,1,2,function(){console.log("Clicked Down")});
+          var spriteButton1a = new SpriteButton(this,(game_width*(13/16)),game_height-112,'button1_war',0,1,2,function(){console.log("Clicked Down")});
           var spriteButton2a = new SpriteButton(this,(game_width*(14/16)),game_height-112,'button1',0,1,2,function(){console.log("Clicked Down")});
           var spriteButton3a = new SpriteButton(this,(game_width*(15/16)),game_height-112,'button1',0,1,2,function(){console.log("Clicked Down")});
 
@@ -136,6 +139,10 @@ window.onload = function() {
           var spriteButton3b = new SpriteButton(this,(game_width*(15/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
 
           var spriteButton3b = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x172531,0x172531,function(){console.log("Clicked Down")});
+
+          //Arrow Test
+
+          this.UI_Arrows = drawUIArrowsWar(this,hexagonWidth+offsetX,hexagonHeight+hexagonHeight/4);
 
      }
      function getHexTile(pointer){
@@ -189,6 +196,34 @@ window.onload = function() {
                this.menu_txt_influence.setText(kingdom.influence);
                this.menu_txt_tax.setText(kingdom.taxrate*100);
                this.menu_txt_attractiveness.setText(kingdom.attractiveness);
+               highlightHex(idHex);
+
+               // 		marker.x = hexagonWidth*posX;
+               // 		marker.y = hexagonHeight/4*3*posY+hexagonHeight/2;
+                    // 		if(posY%2==0){
+               // 			marker.x += hexagonWidth/2;
+               // 		}
+               // 		else{
+               // 			marker.x += hexagonWidth;
+               // 		}
+               let arPosX = atHex.x*hexagonWidth;
+               let arPosY = (atHex.y*hexagonHeight/4*3)+hexagonHeight/2;
+               if(atHex.y%2==0){
+                    arPosX += hexagonWidth/2;
+               }else{
+                    arPosX += hexagonWidth;
+               }
+               //In the future, just move them, don't destroy them
+               this.UI_Arrows.forEach(function(e){e.destroy()});
+               this.UI_Arrows = drawUIArrowsWar(this,arPosX+offsetX,arPosY);
+          }
+     }
+     function highlightHex(idHex){
+          if(idHex >= 0 && idHex <hexagonGroup.getChildren().length){
+               hexagonGroup.getChildren().forEach(function(e){
+                    e.clearTint();
+               });
+               hexagonGroup.getChildren()[idHex].setTint(0xFF0000);
           }
      }
      function checkHex(pointer){
@@ -204,12 +239,7 @@ window.onload = function() {
                this.mouse_txt.setText("M(X/Y):"+pointer.worldX+","+pointer.worldY);
                this.grid_txt.setText("H(X/Y):"+atHex.x+","+atHex.y);
 
-               if(idHex >= 0 && idHex <hexagonGroup.getChildren().length){
-                    hexagonGroup.getChildren().forEach(function(e){
-                         e.clearTint();
-                    });
-                    hexagonGroup.getChildren()[idHex].setTint(0xFF0000);
-               }
+               highlightHex(idHex)
           }
           //placeMarker(candidateX,candidateY);
      }
