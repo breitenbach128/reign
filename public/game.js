@@ -3,7 +3,9 @@ window.onload = function() {
 	var hexagonWidth = 140;
 	var hexagonHeight = 160;
 	var gridSizeX = 12;
-	var gridSizeY = 6;
+     var gridSizeY = 6;
+     var offsetX =0;
+     var offsetY =0;
 	var columns = [Math.ceil(gridSizeX/2),Math.floor(gridSizeX/2)];
      var moveIndex;
      var sectorWidth = hexagonWidth;
@@ -28,7 +30,7 @@ window.onload = function() {
       var game = new Phaser.Game(config);
       
 	function onPreload() {
-		this.load.image("hexagon", "assets/hexagon_tile2.png");
+		this.load.image("hexagon", "assets/hexagon_tile3.png");
           this.load.image("marker", "assets/marker.png");
           this.load.spritesheet("icons", "assets/icons.png",{ frameWidth: 16, frameHeight: 16 });
           this.load.spritesheet("button1", "assets/button1.png",{ frameWidth: 64, frameHeight: 32 });
@@ -41,12 +43,15 @@ window.onload = function() {
 	function onCreate() {
           console.log("created");
           let cv = this.sys.game.canvas;
+          cv.oncontextmenu = function (e) { e.preventDefault(); }
           game_width = cv.width;
           game_height = cv.height;
           offsetX = 250;
           // game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
           // game.scale.pageAlignHorizontally = true;
           // game.scale.pageAlignVertically = true;
+
+          //DRAW BOARD
           var board_rect = this.add.rectangle(game_width/2, game_height/2, game_width, game_height, 0x6993b8);
           board_rect.setInteractive();
 
@@ -76,15 +81,17 @@ window.onload = function() {
           }
           hexagonGroup.x = 0+offsetX;
           hexagonGroup.y = 0;
-          console.log("Group Sizes:",game_width,game_height,hexagonGroup.x,hexagonGroup.y,hexagonGroup);
+          //console.log("Group Sizes:",game_width,game_height,hexagonGroup.x,hexagonGroup.y,hexagonGroup);
 		marker = this.add.sprite(0,0,"marker");
 		marker.setOrigin(0.5);
 		marker.visible=true;//Toggle for testing
-		hexagonGroup.add(marker);  
+          hexagonGroup.add(marker);
+          
+          //INPUT TRACKING
           moveIndex = this.input.on('pointermove', checkHex, this);
-
-          //this.input.on('pointerup', clickHex, this);
           board_rect.on('pointerup', clickHex, this);
+
+          //UI DESIGN
 
           this.mouse_txt = this.add.text(game_width-196, 0, 'M(X/Y):', { fontSize:12, fontFamily: '"xirod"' });
           this.grid_txt = this.add.text(game_width-196, 32, 'H(X/Y):', { fontSize:12, fontFamily: '"xirod"' });
@@ -117,6 +124,18 @@ window.onload = function() {
          this.menu_txt_attractiveness = this.add.text((game_width*(6/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
          this.menu_txt_military = this.add.text((game_width*(7/16))+10, game_height-112, ' 00', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
 
+         //Ownership
+         this.menu_txt_ownership = this.add.text((game_width*(10/16))+10, game_height-112, ' Player1', { stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+
+          //Player Listing
+          this.ui_player_listing_1 = this.add.text(10, 128, ' Player 1', { color:'#00FF00', stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+          this.ui_player_listing_2 = this.add.text(10, 160, ' Player 2', { color:'#FF0000', stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+          this.ui_player_listing_3 = this.add.text(10, 192, ' Player 3', { color:'#0000FF', stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+          this.ui_player_listing_4 = this.add.text(10, 224, ' Player 4', { color:'#FFFF00', stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'left' });
+
+          //Current Turn
+          this.ui_player_current = this.add.text(112, 124, ' <', { stroke:'#000000', strokeThickness:6,fontSize:22, fontFamily: '"xirod"', align:'left' });
+
          //var button1 = new textButton(this, "marker", "BUTTONTEST", {}, 25, 25, function(){console.log("button clicked");}, this);
          var textButton = new uiWidgets.TextButton(
                this,
@@ -138,12 +157,29 @@ window.onload = function() {
           var spriteButton2b = new SpriteButton(this,(game_width*(14/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
           var spriteButton3b = new SpriteButton(this,(game_width*(15/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
 
-          var spriteButton3b = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x172531,0x172531,function(){console.log("Clicked Down")});
+          var spriteButton1c = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x172531,0x172531,function(){console.log("Clicked Down")});
+          this.UI_Arrows = [];
 
-          //Arrow Test
+          //Setup Game
+          
+          //Give Players Ownership
+          let setup_player_list = [1,2,3,4];
+          let player_colors = [0x00FF00,0xFF0000,0x0000FF,0xFFFF00];
+          kingdomsAvailable = hexagonGroup.getChildren();
+          setup_player_list.forEach(function(e){
+               let find = true;
+               while(find){
+                    let tileSelection = Phaser.Math.Between(0,kingdomsAvailable.length);
+                    if(kingdomsAvailable[tileSelection].owner == -1){
+                         find = false;
+                         kingdomsAvailable[tileSelection].owner = e;
+                         kingdomsAvailable[tileSelection].setTint(player_colors[e-1]);
+                    }
+               }
+          });
+          // hexagonGroup.getChildren().forEach(function(e){
 
-          this.UI_Arrows = drawUIArrowsWar(this,hexagonWidth+offsetX,hexagonHeight+hexagonHeight/4);
-
+          // });
      }
      function getHexTile(pointer){
           var candidateX = Math.floor((pointer.worldX-hexagonGroup.x)/sectorWidth);
@@ -186,7 +222,7 @@ window.onload = function() {
      }
      function clickHex(pointer){
           let atHex = getHexTile(pointer);
-               if((atHex.x >= 0 && atHex.x < gridSizeX/2) && (atHex.y >= 0 && atHex.y < gridSizeY)){
+          if((atHex.x >= 0 && atHex.x < gridSizeX/2) && (atHex.y >= 0 && atHex.y < gridSizeY)){
                let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
                let kingdom = hexagonGroup.getChildren()[idHex];
                console.log( kingdom.id, kingdom.wealth)
@@ -196,32 +232,30 @@ window.onload = function() {
                this.menu_txt_influence.setText(kingdom.influence);
                this.menu_txt_tax.setText(kingdom.taxrate*100);
                this.menu_txt_attractiveness.setText(kingdom.attractiveness);
-               highlightHex(idHex);
+               //highlightHex(idHex);
 
-               // 		marker.x = hexagonWidth*posX;
-               // 		marker.y = hexagonHeight/4*3*posY+hexagonHeight/2;
-                    // 		if(posY%2==0){
-               // 			marker.x += hexagonWidth/2;
-               // 		}
-               // 		else{
-               // 			marker.x += hexagonWidth;
-               // 		}
-               let arPosX = atHex.x*hexagonWidth;
-               let arPosY = (atHex.y*hexagonHeight/4*3)+hexagonHeight/2;
-               if(atHex.y%2==0){
-                    arPosX += hexagonWidth/2;
-               }else{
-                    arPosX += hexagonWidth;
-               }
-               //In the future, just move them, don't destroy them
-               this.UI_Arrows.forEach(function(e){e.destroy()});
-               this.UI_Arrows = drawUIArrowsWar(this,arPosX+offsetX,arPosY);
+
+               // let arPosX = atHex.x*hexagonWidth;
+               // let arPosY = (atHex.y*hexagonHeight/4*3)+hexagonHeight/2;
+               // if(atHex.y%2==0){
+               //      arPosX += hexagonWidth/2;
+               // }else{
+               //      arPosX += hexagonWidth;
+               // }
+
+               // //In the future, just move them, don't destroy them
+               // this.UI_Arrows.forEach(function(e){e.destroy()});
+               // this.UI_Arrows = drawUIArrowAllDirections(this,arPosX+offsetX,arPosY);
+               let targets = getNeightborHexs(atHex.x,atHex.y,gridSizeX/2,gridSizeY)
+               //console.log("neighbors of tile",atHex.x,atHex.y,targets);
+               if(this.UI_Arrows.length > 0){this.UI_Arrows.forEach(function(e){e.destroy()});}
+               this.UI_Arrows = drawUIArrowsWar(this,atHex.x,atHex.y,hexagonWidth,hexagonHeight,offsetX,offsetY,targets);
           }
      }
      function highlightHex(idHex){
           if(idHex >= 0 && idHex <hexagonGroup.getChildren().length){
-               hexagonGroup.getChildren().forEach(function(e){
-                    e.clearTint();
+               hexagonGroup.getChildren().forEach(function(e){                   
+                    e.clearTint();                    
                });
                hexagonGroup.getChildren()[idHex].setTint(0xFF0000);
           }
@@ -239,7 +273,7 @@ window.onload = function() {
                this.mouse_txt.setText("M(X/Y):"+pointer.worldX+","+pointer.worldY);
                this.grid_txt.setText("H(X/Y):"+atHex.x+","+atHex.y);
 
-               highlightHex(idHex)
+               //highlightHex(idHex)
           }
           //placeMarker(candidateX,candidateY);
      }

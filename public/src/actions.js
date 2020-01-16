@@ -4,14 +4,25 @@ function getNeightborHexs(hexGridX,hexGridY,hexGridWidth,hexGridHeight){
 
     let x = hexGridX;
     let y = hexGridY;
-
-    //For Horizonal hex Grid
-    let neighborsGrids = [{x:1,y:-1}, //UL
+    let neighborsGrids = [];
+    if(y%2==0){
+        //For Horizonal hex Grid - EVEN
+        neighborsGrids = [{x:0,y:-1}, //UR
+        {x:1,y:0},//R
+        {x:0,y:1},//DR
+        {x:-1,y:1},//DL
+        {x:-1,y:0},//L
+        {x:-1,y:-1}];//UL
+    }else{
+        //For Horizonal hex Grid - ODD
+        neighborsGrids = [{x:1,y:-1}, //UL
         {x:1,y:0},//L
         {x:1,y:1},//DL
         {x:0,y:1},//DR
         {x:-1,y:0},//R
         {x:0,y:-1}];//UR
+    }
+
     
     let neighbors = [];
 
@@ -25,9 +36,45 @@ function getNeightborHexs(hexGridX,hexGridY,hexGridWidth,hexGridHeight){
 
     return neighbors;
 }
+function getHexGridPixelPosition(x,y,hw,hh,oX,oY){
+    let xP = x*hw;
+    let yP = (y*hh/4*3)+hh/2;
+    if(y%2==0){
+        xP += hw/2;
+    }else{
+        xP += hw;
+    }
+    xP = xP+oX;
+    yP = yP+oY;
+    return {x:xP,y:yP}
+}
+function drawUIArrowsWar(scene,kingdomX,kingdomY,hw,hh,oX,oY,targets){
 
-function drawUIArrowsWar(scene,hexPosX,hexPosY){
+    let arrows=[];
 
+    let sourcePoint = getHexGridPixelPosition(kingdomX,kingdomY,hw,hh,oX,oY);
+
+    targets.forEach(function(e){
+        let destPoint = getHexGridPixelPosition(e.x,e.y,hw,hh,oX,oY);
+        //console.log(e.x,e.y,hw,hh,oX,oY,destPoint);
+        let line = scene.add.line(
+            0,
+            0,
+            sourcePoint.x,
+            sourcePoint.y,
+            destPoint.x,
+            destPoint.y,
+            0xff0000
+        ).setOrigin(0, 0)
+        //console.log(line);
+
+        arrows.push(line);
+    })
+
+    return arrows;
+}
+
+function drawUIArrowAllDirections(scene,hexPosX,hexPosY){
     let radialAngle = Math.PI/180*0;
     let radius = 80;
     let starting_angle = 60;
@@ -41,4 +88,18 @@ function drawUIArrowsWar(scene,hexPosX,hexPosY){
         arrows.push(arrow);
     }
     return arrows;
+}
+
+function getHexDistance(/*Hexagon*/ h1, /*Hexagon*/ h2) {
+	var deltaX = h1.x - h2.x;
+	var deltaY = h1.y - h2.y;
+	return ((Math.abs(deltaX) + Math.abs(deltaY) + Math.abs(deltaX - deltaY)) / 2);
+};
+
+function getHexDistance2(h1,h2){
+	var deltaX = h1.x - h2.x;
+    var deltaY = h1.y - h2.y;
+    var deltaD = deltaY - deltaX;
+    console.log(deltaX,deltaY,deltaD);
+   
 }
