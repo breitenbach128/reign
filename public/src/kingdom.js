@@ -4,8 +4,9 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.scene = scene;  
         this.scene.add.existing(this);
     }
-    setup(id){
+    setup(id,hex){
         this.id = id;
+        this.hex = hex;
         this.owner = -1;//Player id that owns it.
         this.name = "SomeKingdom";//Generate from a random list later.
         this.resource = 0;//Does the kingdom have a luxary resource?

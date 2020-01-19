@@ -63,13 +63,14 @@ window.onload = function() {
 					var hexagonX = hexagonWidth*j/2;
 					var hexagonY = hexagonHeight*i*1.5+(hexagonHeight/4*3)*(j%2);	
                          var hexagon = new Kingdom(this,hexagonX+hexagonWidth/2+offsetX,hexagonY+hexagonHeight/2);
-                         hexagon.setup(count);
+                         let hexagonCoord = {x:Math.floor(j/2),y:(j%2)+(i*2)};
+                         hexagon.setup(count,hexagonCoord);
                          hexagonGroup.add(hexagon);
-                         hexTextNames.push(this.add.text(hexagonX+hexagonWidth/2+offsetX, hexagonY+hexagonHeight/2, (j+','+i), { color: "#000000", fontSize:12, fontFamily: '"xirod"', align:'center' }))
-                         console.log(j,i,count);
+                         hexTextNames.push(this.add.text(hexagonX+hexagonWidth/2+offsetX, hexagonY+hexagonHeight/2, (j+','+i + ": "+count+" \n"+hexagonCoord.x + ","+hexagonCoord.y), { color: "#000000", fontSize:12, fontFamily: '"xirod"', align:'center' }).setOrigin(.5))
+                         console.log(j,i,count,hexagonCoord);
                          count++;
-				}
-			}
+                    }
+               }
 		}
 		hexagonGroup.x = (game_width-hexagonWidth*Math.ceil(gridSizeX/2))/2;
           if(gridSizeX%2==0){

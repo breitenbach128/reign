@@ -103,3 +103,66 @@ function getHexDistance2(h1,h2){
     console.log(deltaX,deltaY,deltaD);
    
 }
+
+//If Y is odd for one, but even for the other, then add 1 to the distance.
+function getHexDistance3(h1,h2){
+    if(h1.x == h2.x){
+        return Math.abs(h1.y - h2.y);
+    }else if(h1.y == h2.y){
+        return Math.abs(h1.x - h2.x);
+    }else{
+        let dx = Math.abs(h1.x - h2.x);
+        let dy = Math.abs(h1.y - h2.y);
+        console.log(dx,dy,Math.floor(dy/2));
+        return ((dx + dy + Math.abs(dx - dy)) / 2);
+        // if(h1.x < h2.x){
+        //     console.log("floor",dx,dy,Math.ceil(dx/2));
+        //     return dx + dy - Math.ceil(dx/2);
+        // }else{
+        //     console.log("ceil",dx,dy,Math.floor(dx/2));
+        //     return dx + dy - Math.floor(dx/2);
+        // }
+    }
+}
+
+class Cube {
+    constructor(x,y,z){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
+//I'm using odd R
+//REDBLOBGAMING Blog https://www.redblobgames.com/grids/hexagons/
+function oddr_to_cube(hex){//x = COL, y = ROW here.
+    let x = hex.x - (hex.y - (hex.y&1)) / 2;
+    let z = hex.y;
+    let y = -x-z;
+    return new Cube(x, y, z);
+}
+
+function offset_distance(a, b){
+    //var ac = offset_to_cube(a)
+    //var bc = offset_to_cube(b)
+    //console.log(a,b);
+    //let ac = oddr_to_cube(a);
+    //let bc = oddr_to_cube(b);
+    //console.log(a,b,ac,bc);
+    //return cube_distance_max(ac, bc);
+    return cube_distance_max(a, b);
+}
+
+function cube_distance(a, b){
+    return (Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z)) / 2;
+}
+function cube_distance_max(a, b){
+    console.log(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
+    return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
+}
+
+function doubleheight_to_cube(hex){
+    let x = hex.x;
+    let z = (hex.y - hex.x) / 2;
+    let y = -x-z;
+    return new Cube(x, y, z);
+}
