@@ -14,7 +14,18 @@ window.onload = function() {
      var marker;
      var hexagonGroup;
      var hexTextNames = [];
+     //Scenes
+     var gameScene;
      //Resource Enum
+     //Luxaries
+     // Each luxary gives % bonus to attraction and a special type bonus. All player starting tiles have a single luxary. Not all tiles have luxary.
+     // gold:  Bonus to income
+     // iron:  Bonus to Offense
+     // gems: Bonus to attractivness
+     // fur: Bonus to Growth
+     // wood: Bonus to defense
+     // spices: Bonus to trade
+     //Formula to bonus: bonus = r^(.08)
      var resourceTypes = {
           gold: 0,
           iron: 1,
@@ -23,6 +34,29 @@ window.onload = function() {
           wood: 4,
           spices: 5
      };
+     //Military Data
+     var military_units = {
+          infantry: {cost: 25, upkeep: 1, offense:1, defense:1},
+          archer: {cost: 50, upkeep: 2, offense:1, defense:2},
+          calvary: {cost: 50, upkeep: 3, offense:2, defense:1},
+     }
+     //Building Data
+     // Walls - Boost Defense points by Wall*10%
+     // Farm - Growth + 10%
+     // Keep - Influence + 10%
+     // Barracks - Train + 10% (more)
+     // Mine - Generate luxury from tile + 1
+     // Market - Trade gain + 10%
+     var max_buildings_allowed = 10; //Per Kingdom
+     var building_types = {
+          wall: {cost:10, upkeep: 1, trait:{type:"defense" ,mod:0.10}},
+          farm: {cost: 10, upkeep: 1, trait:{type: "growth", mod:0.10}},
+          keep: {cost: 10, upkeep: 2, trait:{type: "influence", mod:0.10}},
+          barracks: {cost: 10, upkeep: 2, trait:{type: "train", mod:0.10}},
+          mine: {cost: 10, upkeep: 3, trait:{type: "luxury", mod:1.0}},
+          market: {cost: 10, upkeep: 2, trait:{type: "trade", mod:0.10}}
+     }
+
      var resource_img_names = ["icon_gold","icon_iron","icon_gems","icon_fur","icon_wood","icon_spices"];
 
      var config = {
@@ -64,6 +98,7 @@ window.onload = function() {
 	}
 
 	function onCreate() {
+          gameScene = this;
           console.log("created");
           let cv = this.sys.game.canvas;
           cv.oncontextmenu = function (e) { e.preventDefault(); }
@@ -187,7 +222,7 @@ window.onload = function() {
           var spriteButton2b = new SpriteButton(this,(game_width*(14/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
           var spriteButton3b = new SpriteButton(this,(game_width*(15/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
 
-          var spriteButton1c = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x121E27,0x172531,0x45515A,function(){console.log("Clicked Down")},"End Turn");
+          var spriteButton1c = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x121E27,0x172531,0x45515A,endTurn,"End Turn");
           this.UI_Arrows = [];
 
           //Setup Game
@@ -353,6 +388,17 @@ window.onload = function() {
 	// 			marker.x += hexagonWidth;
 	// 		}
 	// 	}
-	// }
+     // }
+     function endTurn(){
+          console.log("Turn Ended for Current Player:")
+          console.log(gameScene.playerKingdoms)
+
+          //For all kingdoms
+          //hexagonGroup.getChildren();
+
+     }
+     function endRound(){
+
+     }
 
 }

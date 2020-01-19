@@ -34,10 +34,12 @@ class RectangleButton extends Phaser.GameObjects.Rectangle{
         super(scene, x, y, w, h, fillColor)
         this.scene = scene;  
         this.scene.add.existing(this);
-        this.fillColor = fillColor;
-        this.downcolor = downColor;
         this.strokeColor = strokeColor;
-        this.hoverColor = hoverColor;
+
+        //State Colors
+        this.idle_color = fillColor;
+        this.down_color = downColor;
+        this.hover_color = hoverColor;
         //Setup Interactive 
         this.setInteractive()
         .on('pointerdown', () => {this.enterButtonDownState();downFunction()})
@@ -51,16 +53,16 @@ class RectangleButton extends Phaser.GameObjects.Rectangle{
 
     }
     enterButtonDownState(){ 
-        this.setFillStyle(this.downcolor);
+        this.setFillStyle(this.down_color);
     }
     enterButtonHoverState(){
-        this.setFillStyle(this.hoverColor);
+        this.setFillStyle(this.idle_color);
     }
     enterButtonRestState(){
-        this.setFillStyle(this.fillColor);
+        this.setFillStyle(this.idle_color);
     }
     resetButton(){
-        this.setFillStyle(this.fillColor);
+        this.setFillStyle(this.idle_color);
     }
 }
 
