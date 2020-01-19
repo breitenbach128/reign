@@ -175,6 +175,8 @@ window.onload = function() {
                          find = false;
                          kingdomsAvailable[tileSelection].owner = e;
                          kingdomsAvailable[tileSelection].setTint(player_colors[e-1]);
+                         console.log("Kingdom Hex to Cube",oddr_to_cube(kingdomsAvailable[tileSelection].hex));
+                         console.log("Distance to 0,0",offset_distance(oddr_to_cube(kingdomsAvailable[tileSelection].hex),oddr_to_cube({x:0,y:0})));
                     }
                }
           });
