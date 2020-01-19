@@ -187,7 +187,7 @@ window.onload = function() {
           var spriteButton2b = new SpriteButton(this,(game_width*(14/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
           var spriteButton3b = new SpriteButton(this,(game_width*(15/16)),game_height-72,'button1',0,1,2,function(){console.log("Clicked Down")});
 
-          var spriteButton1c = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x172531,0x172531,function(){console.log("Clicked Down")},"End Turn");
+          var spriteButton1c = new RectangleButton(this,(game_width*(14/16)),game_height-36,128,32,0x172531,0x121E27,0x172531,0x45515A,function(){console.log("Clicked Down")},"End Turn");
           this.UI_Arrows = [];
 
           //Setup Game

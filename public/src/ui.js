@@ -29,40 +29,38 @@ class SpriteButton extends Phaser.GameObjects.Sprite{
 }
 
 class RectangleButton extends Phaser.GameObjects.Rectangle{
-    constructor(scene,x,y,w,h,fillColor,strokeColor,hoverColor,downFunction,text) {
+    constructor(scene,x,y,w,h,fillColor,downColor,strokeColor,hoverColor,downFunction,text) {
 
         super(scene, x, y, w, h, fillColor)
         this.scene = scene;  
         this.scene.add.existing(this);
         this.fillColor = fillColor;
+        this.downcolor = downColor;
         this.strokeColor = strokeColor;
         this.hoverColor = hoverColor;
         //Setup Interactive 
         this.setInteractive()
-        .on('pointerdown', () => {this.enterButtonDownState(this.fillColor);downFunction()})
-        .on('pointerover', () => this.enterButtonHoverState(this.hoverColor) )
-        .on('pointerout', () => this.enterButtonRestState(this.fillColor) )
-        .on('pointerup', () => this.resetButton(this.fillColor));
+        .on('pointerdown', () => {this.enterButtonDownState();downFunction()})
+        .on('pointerover', () => this.enterButtonHoverState() )
+        .on('pointerout', () => this.enterButtonRestState() )
+        .on('pointerup', () => this.resetButton());
 
         //Text
         this.scene.add.text(x, y, text, { color:'#FFFFFF', stroke:'#000000', strokeThickness:6,fontSize:12, fontFamily: '"xirod"', align:'center' }).setOrigin(.5);
         //Reset Timer
 
     }
-    enterButtonDownState(c){        
-        this.setFillStyle(LightenDarkenColorHex(c,-10));
-        console.log("down",c)
+    enterButtonDownState(){ 
+        this.setFillStyle(this.downcolor);
     }
-    enterButtonHoverState(c){
-        this.setFillStyle(c);
+    enterButtonHoverState(){
+        this.setFillStyle(this.hoverColor);
     }
-    enterButtonRestState(c){
-        this.setFillStyle(c);
-        console.log(c)
+    enterButtonRestState(){
+        this.setFillStyle(this.fillColor);
     }
-    resetButton(c){
-        this.setFillStyle(c);
-        console.log("up",c)
+    resetButton(){
+        this.setFillStyle(this.fillColor);
     }
 }
 
