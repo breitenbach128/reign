@@ -58,7 +58,10 @@ window.onload = function() {
      }
 
      var resource_img_names = ["icon_gold","icon_iron","icon_gems","icon_fur","icon_wood","icon_spices"];
-
+     var gameTracker = {
+          round: 1,
+          currentplayer = 1
+     };
      var config = {
           type: Phaser.AUTO,
           width: 1280,

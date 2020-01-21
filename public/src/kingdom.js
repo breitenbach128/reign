@@ -30,11 +30,34 @@ class Kingdom extends Phaser.GameObjects.Sprite{
             generals: 0,
             mercanaries: 0
         }
+        this.buildings = [];
+        this.max_buildings = 10;
 
 
     }
     update(time,delta){
 
+    }
+    build(building){
+        let b = building_types[building];
+        if(this.wealth >= b.cost && this.buildings.length < this.max_buildings){
+            this.wealth -= b.cost;   
+            //Do Building Built Pop-up
+            
+            //Push Building into List of Kingdom Buidings
+            this.buildings.push(b);
+        }
+    }
+    newTurn(){
+        //Generate Bonus mods
+        let wealth_mod = 0;
+        let growth_mod = 0;
+
+        //Do all the per turn actions specific to the kingdom.
+        this.wealth += (this.population*this.taxrate);
+    }
+    updateMods(){
+        
     }
 }
 
