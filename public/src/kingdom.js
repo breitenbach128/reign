@@ -13,7 +13,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.wealth = 2500;
         this.taxrate = 0.1;
         this.population = 100;
-        this.influence = 0;
+        this.influence = 0;//Acts as a sort of currency/mana for doing many different abilities. Total level compared to neighbor determines attractiveness
         this.luxaries = {
             gold: 0,
             iron: 0,
@@ -52,12 +52,20 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         //Generate Bonus mods
         let wealth_mod = 0;
         let growth_mod = 0;
+        //get basic growths
+        let growth_basic = 10+this.population*.10+(Phaser.Math.Between(10,30));
 
+        //First, grow population.
+        this.population += Math.round(growth_basic+growth_basic*growth_mod);
         //Do all the per turn actions specific to the kingdom.
-        this.wealth += (this.population*this.taxrate);
+        this.wealth += Math.round(this.population*10*this.taxrate);
+
     }
     updateMods(){
         
+    }
+    test(){
+        console.log("test");
     }
 }
 

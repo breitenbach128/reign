@@ -60,7 +60,7 @@ window.onload = function() {
      var resource_img_names = ["icon_gold","icon_iron","icon_gems","icon_fur","icon_wood","icon_spices"];
      var gameTracker = {
           round: 1,
-          currentplayer = 1
+          currentplayer: 1
      };
      var config = {
           type: Phaser.AUTO,
@@ -151,7 +151,7 @@ window.onload = function() {
 		marker = this.add.sprite(0,0,"marker");
 		marker.setOrigin(0.5);
 		marker.visible=false;//Toggle for testing
-          hexagonGroup.add(marker);
+          //hexagonGroup.add(marker);
           
           //INPUT TRACKING
           moveIndex = this.input.on('pointermove', checkHex, this);
@@ -316,18 +316,13 @@ window.onload = function() {
 
           return resultant_index;
      }
+
      function clickHex(pointer){
           let atHex = getHexTile(pointer);
           if((atHex.x >= 0 && atHex.x < gridSizeX/2) && (atHex.y >= 0 && atHex.y < gridSizeY)){
                let idHex = getHexTileIndex(atHex.x,atHex.y, gridSizeX)
                let kingdom = hexagonGroup.getChildren()[idHex];
-               console.log( kingdom.id, kingdom.wealth)
-               this.menu_txt_wealth.setText(kingdom.wealth);
-               this.menu_txt_population.setText(kingdom.population);
-               this.menu_txt_wood.setText(kingdom.luxaries.wood);
-               this.menu_txt_influence.setText(kingdom.influence);
-               this.menu_txt_tax.setText(kingdom.taxrate*100);
-               this.menu_txt_attractiveness.setText(kingdom.attractiveness);
+               updateKingdomInfoDisplay(kingdom);
                //highlightHex(idHex);
 
 
@@ -373,7 +368,14 @@ window.onload = function() {
           }
           //placeMarker(candidateX,candidateY);
      }
-
+     function updateKingdomInfoDisplay(kingdom){
+          gameScene.menu_txt_wealth.setText(kingdom.wealth+"\n +"+Math.round(kingdom.population*10*kingdom.taxrate));
+          gameScene.menu_txt_population.setText(kingdom.population);
+          gameScene.menu_txt_wood.setText(kingdom.luxaries.wood);
+          gameScene.menu_txt_influence.setText(kingdom.influence);
+          gameScene.menu_txt_tax.setText(kingdom.taxrate*100);
+          gameScene.menu_txt_attractiveness.setText(kingdom.attractiveness);
+     }
      //NOT NEEDED CURRENTLY
 
      // function placeMarker(posX,posY){
@@ -393,11 +395,21 @@ window.onload = function() {
 	// 	}
      // }
      function endTurn(){
+          //this.ui_player_current: Set position to ui player name - 4px
+          gameTracker.round++;
           console.log("Turn Ended for Current Player:")
           console.log(gameScene.playerKingdoms)
-
+          gameScene.ui_current_turn.setText(' '+gameTracker.round+'/15')
           //For all kingdoms
-          //hexagonGroup.getChildren();
+          hexagonGroup.getChildren().forEach(function(e){          
+               if (typeof e.newTurn === "function") { 
+                    // safe to use the function
+                    e.newTurn();
+                    updateKingdomInfoDisplay(e);
+               }else{
+                     console.log("no function",e)
+               }              
+          },this);
 
      }
      function endRound(){
