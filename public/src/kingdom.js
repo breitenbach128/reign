@@ -9,7 +9,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.hex = hex;
         this.owner = -1;//Player id that owns it.
         this.name = "SomeKingdom";//Generate from a random list later.
-        this.resource = 0;//Does the kingdom have a luxary resource?
+        this.resource = -1;//Does the kingdom have a luxary resource?
         this.wealth = 2500;
         this.taxrate = 0.1;
         this.population = 100;
@@ -22,7 +22,13 @@ class Kingdom extends Phaser.GameObjects.Sprite{
             wood: 0,
             spices: 0
         };
-        this.attractiveness = 50;
+        //Immigration
+        //Each round, each kingdom cycles thru, updating their attractivness realative to each neighbor.
+        this.neighbors = [
+            {neighbor: {gridX:-1,gridY:-1,id:0},level:0,lastRoundUpdated:0}
+        ];
+        this.allowImmigration = 0;//After a flip, turns to X rounds. At zero, allow, otherwise decrement by 1 per round.
+        //Military
         this.army = {
             infantry: 20,
             archers: 0,
@@ -33,20 +39,12 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.buildings = [];
         this.max_buildings = 10;
 
+        
+
 
     }
     update(time,delta){
 
-    }
-    build(building){
-        let b = building_types[building];
-        if(this.wealth >= b.cost && this.buildings.length < this.max_buildings){
-            this.wealth -= b.cost;   
-            //Do Building Built Pop-up
-            
-            //Push Building into List of Kingdom Buidings
-            this.buildings.push(b);
-        }
     }
     newTurn(){
         //Generate Bonus mods
@@ -59,35 +57,58 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.population += Math.round(growth_basic+growth_basic*growth_mod);
         //Do all the per turn actions specific to the kingdom.
         this.wealth += Math.round(this.population*10*this.taxrate);
+        //Influence Growth is based on keeps, total wealth, luxury uniqueness bonus, and luxury bonus.
+
+        //Luxury growth
+        this.luxuryGrow()
+        //Apply immigration due to attractivness
+        //Luxury bonus, comparative wealth, defense points, influence points are calculated
 
     }
     updateMods(){
         
     }
-    test(){
-        console.log("test");
+    luxuryGrow(){
+        if(this.resource > -1){            
+            this.luxaries[resourceTypes[this.resource]]++;
+            console.log(resourceTypes[this.resource],this.luxaries[resourceTypes[this.resource]]);
+        }
+    }
+    train(troopType){
+
+    }
+    war(kingdom){
+        //attack this kingdom from another kingdom
+    }
+    marry(kingdom){
+
+    }    
+    build(building){
+        let b = building_types[building];
+        if(this.wealth >= b.cost && this.buildings.length < this.max_buildings){
+            this.wealth -= b.cost;   
+            //Do Building Built Pop-up
+            
+            //Push Building into List of Kingdom Buidings
+            this.buildings.push(b);
+        }
+    }
+    trade(kingdom,theirRes,myRes,theirPrice,myPrice){
+
+    }
+    annex(kingdom){
+
     }
 }
 
 
-//Per turn
-// - Immigration Gain/Loss
-// - Income Gain/Loss
-// - Growth
-// - Training
-// - Built
-// - Battle Results
-
-//Actions
-// Train
-// Build
-// Attack (If attacking zero pop kingdom, annex)
-// Diplomacy
-// - Trade
-// - Marriage - Need Influence
-
 //Ways to take over a kingdom
-// - War(Attack)
-// - Economic Domination (Be 80% of a kingdoms wealth source via trade)
+// - War(Attack): If you spend the influence cost, take no penalty. Otherwise, lose  X population.
 // - Marriage (Have enough influence to force them to join you)
 // - Annex (Drive their pop to zero, and then take it.)
+
+
+
+//DO NOT IMPLEMENT YET, but IDEAS BELOW:
+//Other way to win
+// - Economic Domination (Be 80% of a kingdoms wealth source via trade)

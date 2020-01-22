@@ -1,67 +1,6 @@
 window.onload = function() {              
 
-	var hexagonWidth = 140;
-	var hexagonHeight = 160;
-	var gridSizeX = 12;
-     var gridSizeY = 6;
-     var offsetX =0;
-     var offsetY =0;
-	var columns = [Math.ceil(gridSizeX/2),Math.floor(gridSizeX/2)];
-     var moveIndex;
-     var sectorWidth = hexagonWidth;
-     var sectorHeight = hexagonHeight/4*3;
-     var gradient = (hexagonHeight/4)/(hexagonWidth/2);
-     var marker;
-     var hexagonGroup;
-     var hexTextNames = [];
-     //Scenes
-     var gameScene;
-     //Resource Enum
-     //Luxaries
-     // Each luxary gives % bonus to attraction and a special type bonus. All player starting tiles have a single luxary. Not all tiles have luxary.
-     // gold:  Bonus to income
-     // iron:  Bonus to Offense
-     // gems: Bonus to attractivness
-     // fur: Bonus to Growth
-     // wood: Bonus to defense
-     // spices: Bonus to trade
-     //Formula to bonus: bonus = r^(.08)
-     var resourceTypes = {
-          gold: 0,
-          iron: 1,
-          gems: 2,
-          fur: 3,
-          wood: 4,
-          spices: 5
-     };
-     //Military Data
-     var military_units = {
-          infantry: {cost: 25, upkeep: 1, offense:1, defense:1},
-          archer: {cost: 50, upkeep: 2, offense:1, defense:2},
-          calvary: {cost: 50, upkeep: 3, offense:2, defense:1},
-     }
-     //Building Data
-     // Walls - Boost Defense points by Wall*10%
-     // Farm - Growth + 10%
-     // Keep - Influence + 10%
-     // Barracks - Train + 10% (more)
-     // Mine - Generate luxury from tile + 1
-     // Market - Trade gain + 10%
-     var max_buildings_allowed = 10; //Per Kingdom
-     var building_types = {
-          wall: {cost:10, upkeep: 1, trait:{type:"defense" ,mod:0.10}},
-          farm: {cost: 10, upkeep: 1, trait:{type: "growth", mod:0.10}},
-          keep: {cost: 10, upkeep: 2, trait:{type: "influence", mod:0.10}},
-          barracks: {cost: 10, upkeep: 2, trait:{type: "train", mod:0.10}},
-          mine: {cost: 10, upkeep: 3, trait:{type: "luxury", mod:1.0}},
-          market: {cost: 10, upkeep: 2, trait:{type: "trade", mod:0.10}}
-     }
-
-     var resource_img_names = ["icon_gold","icon_iron","icon_gems","icon_fur","icon_wood","icon_spices"];
-     var gameTracker = {
-          round: 1,
-          currentplayer: 1
-     };
+	
      var config = {
           type: Phaser.AUTO,
           width: 1280,
