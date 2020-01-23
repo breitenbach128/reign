@@ -155,6 +155,8 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         let local_defensePoints = this.getDefensePoints();
         //Current wealth 
         let local_wealth = this.wealth;
+        //Tax rate
+        let local_taxrate = this.taxrate;
 
         //Run immigration process
         //Compare values to get migration value. negative=lose people.positive=gain people. Sort in order of
