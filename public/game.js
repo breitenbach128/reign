@@ -71,7 +71,7 @@ window.onload = function() {
                          hexagonGroup.add(hexagon);
                          this.add.image(hexagonX+hexagonWidth/2+offsetX,hexagonY+hexagonHeight/2,'terrain_icons',Phaser.Math.Between(0,3));
                          hexTextNames.push(this.add.text(hexagonX+hexagonWidth/2+offsetX, hexagonY+hexagonHeight/2-32, (j+','+i + ": "+count+" \n"+hexagonCoord.x + ","+hexagonCoord.y), { color: "#000000", fontSize:12, fontFamily: '"xirod"', align:'center' }).setOrigin(.5))
-                         console.log(j,i,count,hexagonCoord);
+                         //console.log(j,i,count,hexagonCoord);//DEBUG
                          count++;
                     }
                }
@@ -86,6 +86,15 @@ window.onload = function() {
           }
           hexagonGroup.x = 0+offsetX;
           hexagonGroup.y = 0;
+          //Generate simple list name
+          let kingdomsAvailable = hexagonGroup.getChildren();
+
+          //Generate neighbors and update kingdoms with their neighbors
+          kingdomsAvailable.forEach(e =>{
+               let nbs=getNeightborHexs(e.hex.x,e.hex.y,gridSizeX/2,gridSizeY);
+               e.setNeighbors(nbs,kingdomsAvailable);
+          });
+
           //console.log("Group Sizes:",game_width,game_height,hexagonGroup.x,hexagonGroup.y,hexagonGroup);
 		marker = this.add.sprite(0,0,"marker");
 		marker.setOrigin(0.5);
@@ -174,8 +183,7 @@ window.onload = function() {
           //Give Players Ownership
           this.playerKingdoms = [];//Selected kingdom quick reference
           let setup_player_list = [1,2,3,4];
-          let player_colors = [0x00FF00,0xFF0000,0x0000FF,0xFFFF00];
-          kingdomsAvailable = hexagonGroup.getChildren();
+          let player_colors = [0x00FF00,0xFF0000,0x0000FF,0xFFFF00];          
           setup_player_list.forEach(function(e){
                let find = true;
                while(find){
@@ -335,6 +343,7 @@ window.onload = function() {
      // }
      function endTurn(){
           //this.ui_player_current: Set position to ui player name - 4px
+          //ui_player_listing_1
           gameTracker.round++;
           console.log("Turn Ended for Current Player:")
           console.log(gameScene.playerKingdoms)

@@ -24,9 +24,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         };
         //Immigration
         //Each round, each kingdom cycles thru, updating their attractivness realative to each neighbor.
-        this.neighbors = [
-            {neighbor: {gridX:-1,gridY:-1,id:0},level:0,lastRoundUpdated:0}
-        ];
+        this.neighbors = [];
         this.allowImmigration = 0;//After a flip, turns to X rounds. At zero, allow, otherwise decrement by 1 per round.
         //Military
         this.army = {
@@ -41,6 +39,21 @@ class Kingdom extends Phaser.GameObjects.Sprite{
 
         
 
+
+    }
+
+    setNeighbors(nlist,klist){
+        //Foreach neighbor in nlist
+        nlist.forEach(e => {            
+            //Get the Kingdom object
+            let k = getKingdomByHexCoords(e.x,e.y,klist);
+            if(k != -1){
+                this.neighbors.push({kingdom:k,migrationChange:0,lastRoundUpdated:0});
+            }else{
+                console.log("Error getting neighbor kingdom for ",e);
+            }
+
+        },this);
 
     }
     update(time,delta){
@@ -68,11 +81,34 @@ class Kingdom extends Phaser.GameObjects.Sprite{
     updateMods(){
         
     }
+    migrate(){
+        //Unique Luxury bonus: For each unique resource you have, gain X points;
+        let uniqueLux = 0;
+        resourceTypes.forEach(e=>{
+            if(this.luxaries[e] > 0){uniqueLux++;}
+        });
+        //Attractiviness mod from Gems
+
+        //Influence points in reserve 
+
+        //Defense points total 
+
+        //Current wealth 
+
+        //Run immigration process
+        this.neighbors.forEach(e=>{
+
+        });
+
+    }
     luxuryGrow(){
         if(this.resource > -1){            
             this.luxaries[resourceTypes[this.resource]]++;
             console.log(resourceTypes[this.resource],this.luxaries[resourceTypes[this.resource]]);
         }
+    }
+    addPopulation(n){
+        this.population+= n;        
     }
     train(troopType){
 

@@ -156,7 +156,7 @@ function cube_distance(a, b){
     return (Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z)) / 2;
 }
 function cube_distance_max(a, b){
-    console.log(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
+    //console.log(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));//DEBUG
     return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
 }
 
@@ -165,4 +165,16 @@ function doubleheight_to_cube(hex){
     let z = (hex.y - hex.x) / 2;
     let y = -x-z;
     return new Cube(x, y, z);
+}
+//Kingdom to Hex Conversions
+function getKingdomByHexCoords(x,y, kingdomlist){
+    let found=-1;
+    kingdomlist.forEach(kingdom => {
+        if(kingdom.hex.x == x && kingdom.hex.y == y){
+            found =  kingdom;
+            return;
+        }
+    });
+    //ERROR, NO KINGDOM FOUND
+    return found;
 }
