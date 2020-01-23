@@ -11,6 +11,8 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.name = "SomeKingdom";//Generate from a random list later.
         this.resource = -1;//Does the kingdom have a luxary resource?
         this.wealth = 2500;
+        this.expenses = {troops:0,buildings:0};
+        this.income = 0;
         this.taxrate = 0.1;
         this.population = 100;
         this.influence = 0;//Acts as a sort of currency/mana for doing many different abilities. Total level compared to neighbor determines attractiveness
@@ -29,13 +31,28 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         //Military
         this.army = {
             infantry: 20,
-            archers: 0,
+            archer: 0,
             calvary: 0,
-            generals: 0,
-            mercanaries: 0
+            mercenaries: 20,
+            knights: 0,
+            raiders: 0,
+            berserkers: 20,
+            catapults: 0,
+            handcannoneers: 0
         }
         this.buildings = [];
         this.max_buildings = 10;
+        this.modifiers = {
+            wealth: 0.0,
+            growth: 0.0,
+            offense: 0.0,
+            defense: 0.0,
+            influence: 0.0,
+            luxury: 0.0,
+            trade: 0.0,
+            attractiveness: 0.0,
+            train: 0.0
+        }
 
         
 
@@ -60,51 +77,104 @@ class Kingdom extends Phaser.GameObjects.Sprite{
 
     }
     newTurn(){
+
+        //Pay Upkeep for Buildings
+        this.buildings.forEach(e =>{
+            this.expenses.buildings+=(e.upkeep);
+        },this);
+        //Pay Upkeep for Troops        
+        Object.keys(this.army).forEach(e=>{
+            this.expenses.troops+= (military_units[e].cost*this.army[e]);
+        },this);
+
+
+        this.wealth -= (this.expenses.buildings+this.expenses.troops);
+        //If wealth goes negative, troops disband, buildings fall apart. Negative wealth also affects the mod for growth
+
         //Generate Bonus mods
-        let wealth_mod = 0;
-        let growth_mod = 0;
+        this.updateMods();
+
         //get basic growths
         let growth_basic = 10+this.population*.10+(Phaser.Math.Between(10,30));
+        let influence_basic = (Math.ceil(this.population/1000) +Math.ceil(this.wealth/1000) + 1 + (this.buildings.filter(function(e){ return e.name == 'keep'})).length)
+        
+        this.population += Math.round(growth_basic+growth_basic*this.modifiers.growth);
 
-        //First, grow population.
-        this.population += Math.round(growth_basic+growth_basic*growth_mod);
-        //Do all the per turn actions specific to the kingdom.
-        this.wealth += Math.round(this.population*10*this.taxrate);
-        //Influence Growth is based on keeps, total wealth, luxury uniqueness bonus, and luxury bonus.
+        this.income = Math.round(this.population*10*this.taxrate);
+        this.wealth += this.income;
 
+        this.influence += (influence_basic + influence_basic*this.modifiers.influence);
+        
         //Luxury growth
         this.luxuryGrow()
-        //Apply immigration due to attractivness
-        //Luxury bonus, comparative wealth, defense points, influence points are calculated
+
 
     }
+    getDefensePoints(){
+        let dps = 0;
+        Object.keys(this.army).forEach(e=>{
+            ops+=(military_units[e].defense*this.army[e]);
+        },this);
+        return dps;
+    }
+    getOffensePoints(){
+        let ops = 0;
+        Object.keys(this.army).forEach(e=>{
+            ops+=(military_units[e].offense*this.army[e]);
+        },this);
+        return ops;
+    }
     updateMods(){
-        
+        //Zero out mods
+        this.modifiers = {wealth: 0.0,growth: 0.0,offense: 0.0,defense: 0.0,influence: 0.0,luxury: 0.0,trade: 0.0,attractiveness: 0.0,train: 0.0};
+        //Get Buildings First
+        this.buildings.forEach(e =>{
+            this.modifiers[e.trait.type]+=e.trait.mod;
+        });
+
+        //Get Luxuries Second
+        this.modifiers.wealth += this.luxaries.gold * luxury_bonus.gold.mod;
+        this.modifiers.offense += this.luxaries.iron * luxury_bonus.iron.mod;
+        this.modifiers.attractiveness += this.luxaries.gems * luxury_bonus.gems.mod;
+        this.modifiers.growth += this.luxaries.fur * luxury_bonus.fur.mod;
+        this.modifiers.defense += this.luxaries.wood * luxury_bonus.wood.mod;
+        this.modifiers.trade += this.luxaries.spices * luxury_bonus.spices.mod;
+
     }
     migrate(){
         //Unique Luxury bonus: For each unique resource you have, gain X points;
-        let uniqueLux = 0;
+        let local_uniqueLux = 0;
         resourceTypes.forEach(e=>{
-            if(this.luxaries[e] > 0){uniqueLux++;}
+            if(this.luxaries[e] > 0){local_uniqueLux++;}
         });
-        //Attractiviness mod from Gems
-
+        //Attractiviness mod 
+        let local_attractMod = this.modifiers.attractiveness;
         //Influence points in reserve 
-
+        let local_influencePoints = this.influence;
         //Defense points total 
-
+        let local_defensePoints = this.getDefensePoints();
         //Current wealth 
+        let local_wealth = this.wealth;
 
         //Run immigration process
-        this.neighbors.forEach(e=>{
+        //Compare values to get migration value. negative=lose people.positive=gain people. Sort in order of
+        //most attractive neighbors to least. Do the kingdom migrations in that order.
 
+        this.neighbors.forEach(e=>{
+            //Has it been updated yet with this kingdom?
+            if(e.lastRoundUpdated < gameTracker.round){
+
+
+                //On the neighbor kingdom, find this source kingdom and update its lastroundupdated value to keep
+                //only one migration between each pair of kingdoms.
+
+            }
         });
 
     }
     luxuryGrow(){
         if(this.resource > -1){            
-            this.luxaries[resourceTypes[this.resource]]++;
-            console.log(resourceTypes[this.resource],this.luxaries[resourceTypes[this.resource]]);
+            this.luxaries[resourceTypes[this.resource]]++;            
         }
     }
     addPopulation(n){
@@ -113,8 +183,14 @@ class Kingdom extends Phaser.GameObjects.Sprite{
     train(troopType){
 
     }
-    war(kingdom){
+    march(kingdom){
+        //Moves troops to another kingdom
+    }
+    warAttack(kingdom){
         //attack this kingdom from another kingdom
+    }
+    warDefend(kingdom){
+
     }
     marry(kingdom){
 

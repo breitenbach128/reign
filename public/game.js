@@ -316,7 +316,7 @@ window.onload = function() {
           //placeMarker(candidateX,candidateY);
      }
      function updateKingdomInfoDisplay(kingdom){
-          gameScene.menu_txt_wealth.setText(kingdom.wealth+"\n +"+Math.round(kingdom.population*10*kingdom.taxrate));
+          gameScene.menu_txt_wealth.setText(kingdom.wealth+"\n +"+kingdom.income+"\n -"+(kingdom.expenses.buildings+kingdom.expenses.troops)+"\n_________\n"+(kingdom.income-(kingdom.expenses.buildings+kingdom.expenses.troops)));
           gameScene.menu_txt_population.setText(kingdom.population);
           gameScene.menu_txt_wood.setText(kingdom.luxaries.wood);
           gameScene.menu_txt_influence.setText(kingdom.influence);
