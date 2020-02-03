@@ -108,12 +108,15 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         //Luxury growth
         this.luxuryGrow()
 
+        //Migration
+        this.migrate();
+
 
     }
     getDefensePoints(){
         let dps = 0;
         Object.keys(this.army).forEach(e=>{
-            ops+=(military_units[e].defense*this.army[e]);
+            dps+=(military_units[e].defense*this.army[e]);
         },this);
         return dps;
     }
@@ -157,21 +160,49 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         let local_wealth = this.wealth;
         //Tax rate
         let local_taxrate = this.taxrate;
+        //Local Size
+        let local_population = this.population;
 
         //Run immigration process
         //Compare values to get migration value. negative=lose people.positive=gain people. Sort in order of
         //most attractive neighbors to least. Do the kingdom migrations in that order.
 
-        this.neighbors.forEach(e=>{
-            //Has it been updated yet with this kingdom?
-            if(e.lastRoundUpdated < gameTracker.round){
+        //Idea instead. Each value is a ratio. Whomever is bigger, it generates a ratio point bonus.
+        //Example: 100 wealth to 10 wealth. K1 is 10x bigger, so it gets 10 pop from the smaller kindom.
+        
+        //Modifiered is applied to size bonus. Population vs population
 
+        //To keep it fair, the for loop rotates starting each turn with a different neighbor, and wraps back to 0 after 5. This means there needs
+        //to be a 6 diviable turn count. (30 turns) to keep it fair.
+        let temp_ar = [];
+        for(let lkn=0;lkn < this.neighbors.length;lkn++){
+            let rnd_off_set = gameTracker.round%this.neighbors.length;
+            let new_index = lkn + rnd_off_set;
+            let final_index = new_index > this.neighbors.length ? new_index - this.neighbors.length : new_index;     
+            temp_ar.push(final_index);       
+        }
+        console.log(temp_ar);
 
-                //On the neighbor kingdom, find this source kingdom and update its lastroundupdated value to keep
-                //only one migration between each pair of kingdoms.
+        //GOOD IDEA, BUT NOT WANT I WANT
+        // console.log("Updating Migration for ",this.id, "game turn", gameTracker.round);
+        // this.neighbors.forEach(e=>{
+        //     let kingdomId = this.id;
+        //     //Has it been updated yet with this kingdom?
+        //     if(e.lastRoundUpdated < gameTracker.round-1){
+        //         //Update to current round
+        //         console.log(kingdomId,"neighbor needed update",e.kingdom.id);
+        //         e.lastRoundUpdated++;
+        //         //On the neighbor kingdom, find this source kingdom and update its lastroundupdated value 
+        //         e.kingdom.neighbors.forEach(n=>{
+        //             if(n.kingdom.id == kingdomId){
+        //                 console.log("Found source kingdom in neighbor, neighbors list");
+        //                 n.lastRoundUpdated++;
+        //             }
+        //         });
+                
 
-            }
-        });
+        //     }
+        // },this);
 
     }
     luxuryGrow(){
