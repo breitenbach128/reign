@@ -15,7 +15,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.income = 0;
         this.taxrate = 0.1;
         this.population = 100;
-        this.influence = 0;//Acts as a sort of currency/mana for doing many different abilities. Total level compared to neighbor determines attractiveness
+        this.influence = 1;//Acts as a sort of currency/mana for doing many different abilities. Total level compared to neighbor determines attractiveness
         this.luxaries = {
             gold: 0,
             iron: 0,
@@ -108,7 +108,10 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         //Luxury growth
         this.luxuryGrow()
 
-        //Migration
+        //Migration!!!!!!
+        //FIGURED OUT THE BUG!
+        //THIS HAS TO BE HIGHER LEVEL. IT HAS TO HAPPEN AFTER THE TURN IS PROCESSED FOR ALL KINGDOMS. 
+        //THEN IT MUST RUN, AND THEN A FINAL TIME TO ALLOW GAINS/LOSS
         this.migrate();
 
 
@@ -142,9 +145,10 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.modifiers.growth += this.luxaries.fur * luxury_bonus.fur.mod;
         this.modifiers.defense += this.luxaries.wood * luxury_bonus.wood.mod;
         this.modifiers.trade += this.luxaries.spices * luxury_bonus.spices.mod;
+        //onsole.log("Modifiers",this.modifiers);//DEBUG
 
     }
-    migrate(){
+    getMigrationScoreData(){
         //Unique Luxury bonus: For each unique resource you have, gain X points;
         let local_uniqueLux = 0;
         resourceTypes.forEach(e=>{
@@ -154,6 +158,9 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         let local_attractMod = this.modifiers.attractiveness;
         //Influence points in reserve 
         let local_influencePoints = this.influence;
+        //Base Influence Score
+        console.log("MSD",this.id,local_influencePoints,local_attractMod,local_uniqueLux*0.1)
+        let local_base_influenceScore = local_influencePoints+(local_influencePoints*local_attractMod)+(local_influencePoints*local_uniqueLux*0.1);
         //Defense points total 
         let local_defensePoints = this.getDefensePoints();
         //Current wealth 
@@ -162,6 +169,19 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         let local_taxrate = this.taxrate;
         //Local Size
         let local_population = this.population;
+
+        return {
+            influence: local_base_influenceScore,
+            defense: local_defensePoints,
+            wealth: local_wealth,
+            tax: local_taxrate,
+            pop:local_population,
+            id:this.id
+        };
+    }
+    migrate(){
+        //Migration Score Data
+        let lMSD = this.getMigrationScoreData();
 
         //Run immigration process
         //Compare values to get migration value. negative=lose people.positive=gain people. Sort in order of
@@ -181,7 +201,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
             let final_index = new_index > this.neighbors.length ? new_index - this.neighbors.length : new_index;     
             temp_ar.push(final_index);       
         }
-        console.log(temp_ar);
+        //console.log(temp_ar);
 
         //GOOD IDEA, BUT NOT WANT I WANT
         // console.log("Updating Migration for ",this.id, "game turn", gameTracker.round);
@@ -203,6 +223,31 @@ class Kingdom extends Phaser.GameObjects.Sprite{
 
         //     }
         // },this);
+
+        //MAX LOSS IS 12% per kingdom turn. 60% total worse case.
+        //SIMPLEST IDEA YET. No rotation, no checking. Just worry about self gain, and loss.
+        console.log(this.id,"__________",this.influence);
+        //this.neighbors.forEach(e=>{
+            //let rMSD = e.kingdom.getMigrationScoreData();
+            //console.log(e.kingdom.id,e.kingdom.influence)
+            // let diff_influence = (lMSD.influence/rMSD.influence) - 1;
+            // let diff_defense = (lMSD.defense/rMSD.defense) - 1;
+            // let diff_wealth = (lMSD.wealth/rMSD.wealth) - 1;
+            // let diff_tax = (lMSD.tax/rMSD.tax) - 1;
+            // let diff_pop = (lMSD.pop/rMSD.pop) - 1;
+            
+            //IF RATIO > 1, gain. If RATIO < 1, Lose.
+            //console.log(diff_influence.toFixed(4),diff_defense.toFixed(4),diff_wealth.toFixed(4),diff_tax.toFixed(4),diff_pop.toFixed(4));
+
+        //});
+        for(let k=0;k < this.neighbors.length;k++){
+            console.log(this.neighbors[k].kingdom.id,this.neighbors[k].kingdom.hex,this.neighbors[k].kingdom.influence)
+        }
+
+
+        //Calc and then apply after calc for every kingdom.
+
+
 
     }
     luxuryGrow(){
