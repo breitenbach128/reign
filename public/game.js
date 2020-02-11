@@ -348,11 +348,21 @@ window.onload = function() {
           console.log("Turn Ended for Current Player:")
           console.log(gameScene.playerKingdoms)
           gameScene.ui_current_turn.setText(' '+gameTracker.round+'/15')
-          //For all kingdoms
+          //For all kingdoms, run end turn calcs
           hexagonGroup.getChildren().forEach(function(e){          
                if (typeof e.newTurn === "function") { 
                     // safe to use the function
                     e.newTurn();
+                    updateKingdomInfoDisplay(e);
+               }else{
+                     console.log("no function",e)
+               }              
+          },this);
+          //Migrate Population after all calculations completed
+          hexagonGroup.getChildren().forEach(function(e){          
+               if (typeof e.newTurn === "function") { 
+                    // safe to use the function
+                    e.migrate();
                     updateKingdomInfoDisplay(e);
                }else{
                      console.log("no function",e)

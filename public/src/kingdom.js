@@ -106,13 +106,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.influence += (influence_basic + influence_basic*this.modifiers.influence);
         
         //Luxury growth
-        this.luxuryGrow()
-
-        //Migration!!!!!!
-        //FIGURED OUT THE BUG!
-        //THIS HAS TO BE HIGHER LEVEL. IT HAS TO HAPPEN AFTER THE TURN IS PROCESSED FOR ALL KINGDOMS. 
-        //THEN IT MUST RUN, AND THEN A FINAL TIME TO ALLOW GAINS/LOSS
-        this.migrate();
+        this.luxuryGrow();
 
 
     }
@@ -159,7 +153,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         //Influence points in reserve 
         let local_influencePoints = this.influence;
         //Base Influence Score
-        console.log("MSD",this.id,local_influencePoints,local_attractMod,local_uniqueLux*0.1)
+        //console.log("MSD",this.id,local_influencePoints,local_attractMod,local_uniqueLux*0.1)
         let local_base_influenceScore = local_influencePoints+(local_influencePoints*local_attractMod)+(local_influencePoints*local_uniqueLux*0.1);
         //Defense points total 
         let local_defensePoints = this.getDefensePoints();
@@ -241,11 +235,18 @@ class Kingdom extends Phaser.GameObjects.Sprite{
 
         //});
         for(let k=0;k < this.neighbors.length;k++){
-            console.log(this.neighbors[k].kingdom.id,this.neighbors[k].kingdom.hex,this.neighbors[k].kingdom.influence)
+            let nbrKd = this.neighbors[k].kingdom;
+            let rMSD = nbrKd.getMigrationScoreData();
+            let diff_influence = lMSD.influence >= rMSD.influence ? (lMSD.influence/rMSD.influence):-(rMSD.influence/lMSD.influence);
+            let diff_defense =  lMSD.defense >= rMSD.defense ? (lMSD.defense/rMSD.defense):-(rMSD.infldefenseuence/lMSD.defense);
+            let diff_wealth = lMSD.wealth >= rMSD.wealth ? (lMSD.wealth/rMSD.wealth):-(rMSD.wealth/lMSD.wealth);
+            let diff_tax =  lMSD.tax >= rMSD.tax ? (lMSD.tax/rMSD.tax):-(rMSD.tax/lMSD.tax);
+            let diff_pop =  lMSD.pop >= rMSD.pop ? (lMSD.pop/rMSD.pop):-(rMSD.pop/lMSD.pop);
+
+            let migChange = diff_influence+diff_defense+diff_wealth+diff_tax+diff_pop;
+            console.log(this.id,nbrKd.id,migChange,lMSD.influence-rMSD.influence);
         }
 
-
-        //Calc and then apply after calc for every kingdom.
 
 
 
