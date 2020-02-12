@@ -178,3 +178,16 @@ function getKingdomByHexCoords(x,y, kingdomlist){
     //ERROR, NO KINGDOM FOUND
     return found;
 }
+
+function normalize(val, max, min) { return (val - min) / (max - min); }
+
+function capNumber(val, cap){
+    
+    if(val < 0){
+        return val < -cap ? -cap : val;
+
+    }else{
+        return val > cap ? cap : val;
+
+    }    
+};

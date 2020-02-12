@@ -15,6 +15,7 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         this.income = 0;
         this.taxrate = 0.1;
         this.population = 100;
+        this.growthrate = {migration:0,normal:0};
         this.influence = 1;//Acts as a sort of currency/mana for doing many different abilities. Total level compared to neighbor determines attractiveness
         this.luxaries = {
             gold: 0,
@@ -98,7 +99,9 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         let growth_basic = 10+this.population*.10+(Phaser.Math.Between(10,30));
         let influence_basic = (Math.ceil(this.population/1000) +Math.ceil(this.wealth/1000) + 1 + (this.buildings.filter(function(e){ return e.name == 'keep'})).length)
         
-        this.population += Math.round(growth_basic+growth_basic*this.modifiers.growth);
+        if(this.population > 0){ //CANT GROW DEAD KINGDOMS
+            this.population += Math.round(growth_basic+growth_basic*this.modifiers.growth);
+        }
 
         this.income = Math.round(this.population*10*this.taxrate);
         this.wealth += this.income;
@@ -178,75 +181,36 @@ class Kingdom extends Phaser.GameObjects.Sprite{
         let lMSD = this.getMigrationScoreData();
 
         //Run immigration process
-        //Compare values to get migration value. negative=lose people.positive=gain people. Sort in order of
-        //most attractive neighbors to least. Do the kingdom migrations in that order.
-
-        //Idea instead. Each value is a ratio. Whomever is bigger, it generates a ratio point bonus.
-        //Example: 100 wealth to 10 wealth. K1 is 10x bigger, so it gets 10 pop from the smaller kindom.
-        
-        //Modifiered is applied to size bonus. Population vs population
-
-        //To keep it fair, the for loop rotates starting each turn with a different neighbor, and wraps back to 0 after 5. This means there needs
-        //to be a 6 diviable turn count. (30 turns) to keep it fair.
-        let temp_ar = [];
-        for(let lkn=0;lkn < this.neighbors.length;lkn++){
-            let rnd_off_set = gameTracker.round%this.neighbors.length;
-            let new_index = lkn + rnd_off_set;
-            let final_index = new_index > this.neighbors.length ? new_index - this.neighbors.length : new_index;     
-            temp_ar.push(final_index);       
-        }
-        //console.log(temp_ar);
-
-        //GOOD IDEA, BUT NOT WANT I WANT
-        // console.log("Updating Migration for ",this.id, "game turn", gameTracker.round);
-        // this.neighbors.forEach(e=>{
-        //     let kingdomId = this.id;
-        //     //Has it been updated yet with this kingdom?
-        //     if(e.lastRoundUpdated < gameTracker.round-1){
-        //         //Update to current round
-        //         console.log(kingdomId,"neighbor needed update",e.kingdom.id);
-        //         e.lastRoundUpdated++;
-        //         //On the neighbor kingdom, find this source kingdom and update its lastroundupdated value 
-        //         e.kingdom.neighbors.forEach(n=>{
-        //             if(n.kingdom.id == kingdomId){
-        //                 console.log("Found source kingdom in neighbor, neighbors list");
-        //                 n.lastRoundUpdated++;
-        //             }
-        //         });
-                
-
-        //     }
-        // },this);
-
-        //MAX LOSS IS 12% per kingdom turn. 60% total worse case.
-        //SIMPLEST IDEA YET. No rotation, no checking. Just worry about self gain, and loss.
+       
         console.log(this.id,"__________",this.influence);
-        //this.neighbors.forEach(e=>{
-            //let rMSD = e.kingdom.getMigrationScoreData();
-            //console.log(e.kingdom.id,e.kingdom.influence)
-            // let diff_influence = (lMSD.influence/rMSD.influence) - 1;
-            // let diff_defense = (lMSD.defense/rMSD.defense) - 1;
-            // let diff_wealth = (lMSD.wealth/rMSD.wealth) - 1;
-            // let diff_tax = (lMSD.tax/rMSD.tax) - 1;
-            // let diff_pop = (lMSD.pop/rMSD.pop) - 1;
-            
-            //IF RATIO > 1, gain. If RATIO < 1, Lose.
-            //console.log(diff_influence.toFixed(4),diff_defense.toFixed(4),diff_wealth.toFixed(4),diff_tax.toFixed(4),diff_pop.toFixed(4));
 
-        //});
+        let totalMigChange = 0;
+        
         for(let k=0;k < this.neighbors.length;k++){
             let nbrKd = this.neighbors[k].kingdom;
             let rMSD = nbrKd.getMigrationScoreData();
-            let diff_influence = lMSD.influence >= rMSD.influence ? (lMSD.influence/rMSD.influence):-(rMSD.influence/lMSD.influence);
-            let diff_defense =  lMSD.defense >= rMSD.defense ? (lMSD.defense/rMSD.defense):-(rMSD.infldefenseuence/lMSD.defense);
-            let diff_wealth = lMSD.wealth >= rMSD.wealth ? (lMSD.wealth/rMSD.wealth):-(rMSD.wealth/lMSD.wealth);
-            let diff_tax =  lMSD.tax >= rMSD.tax ? (lMSD.tax/rMSD.tax):-(rMSD.tax/lMSD.tax);
-            let diff_pop =  lMSD.pop >= rMSD.pop ? (lMSD.pop/rMSD.pop):-(rMSD.pop/lMSD.pop);
+            //Normalize it to a percentage of standard difference range. Then cap the bonus to 1. This will become 1% later.
+            let diff_influence = capNumber(normalize(lMSD.influence-rMSD.influence,10,0),1);
+            let diff_defense =   capNumber(normalize(lMSD.defense-rMSD.defense,100,0),1);
+            let diff_wealth =  capNumber(normalize(lMSD.wealth-rMSD.wealth,100,0),1);
+            let diff_tax =  capNumber(rMSD.tax-lMSD.tax,1);//This is flipped since I want a lower tax rate for migration
 
-            let migChange = diff_influence+diff_defense+diff_wealth+diff_tax+diff_pop;
-            console.log(this.id,nbrKd.id,migChange,lMSD.influence-rMSD.influence);
+            //THIS SETS IT TO A MAX OF 1% PER CATEGORY, FOR A TOTAL OF 4% PER NEIGHBOR, MAX 24% OVERALL
+            let diff_percent = diff_influence+diff_defense+diff_wealth+diff_tax;
+            let pop_change = 0;
+            //console.log(diff_influence,diff_defense,diff_wealth,diff_tax);
+            if(diff_percent < 0){ //LOSS POP
+                pop_change = Math.round((diff_percent/100) * lMSD.pop);
+            }else if(diff_percent > 0){ //GAIN POP
+                pop_change = Math.round((diff_percent/100) * rMSD.pop);
+            }
+            console.log(this.id,nbrKd.id,diff_percent/100,pop_change);
+            this.neighbors[k].migrationChange = pop_change;
+            totalMigChange+=pop_change;
         }
-
+        console.log("Total Change this round for:" ,this.id,totalMigChange);
+        this.population = this.population + totalMigChange;
+        if(this.population < 0){this.population = 0;}
 
 
 
